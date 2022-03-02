@@ -1,11 +1,14 @@
+import Button from "./Button"
+import { ButtonContainer } from "./styles"
+
 export default function Buttons(props) {
   const { start, pause, reset } = props.buttons
 
   return (
-    <div>
-      <button onClick={start}>Iniciar</button>
-      <button onClick={pause}>Parar</button>
-      <button onClick={reset}>Resetar</button>
-    </div>
+    <ButtonContainer>
+      <Button className={'play'} interaction={start} color="#3266CC" />
+      <Button className={'pause'} interaction={pause} color="#3266CC" />
+      <Button className={'refresh'} interaction={reset} />
+    </ButtonContainer>
   )
 }

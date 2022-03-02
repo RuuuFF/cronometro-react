@@ -2,7 +2,8 @@ import { useState, useEffect } from "react"
 
 const initialTimeState = {
   display: '00:00:00',
-  isRunning: false,
+  isStarted: false,
+  isPaused: false,
   id: 0,
   hours: 0,
   minutes: 0,
@@ -29,12 +30,6 @@ export default function useStopwatch() {
     }))
   }
 
-  function clearId() {
-    clearInterval(timer.id)
-    updateTimerState('id', 0)
-    updateTimerState('isRunning', false)
-  }
-
   function updateTime(event, time, max = 59) {
     const value = Number(event.target.value)
 
@@ -54,6 +49,11 @@ export default function useStopwatch() {
     updateTimerState('display', value)
   }
 
+  function clearId() {
+    clearInterval(timer.id)
+    updateTimerState('id', 0)
+  }
+
   function clock() {
     if (display.seconds > 0) {
       display.seconds -= 1
@@ -68,34 +68,37 @@ export default function useStopwatch() {
 
     if (display.hours === 0 && display.minutes === 0 && display.seconds === 0) {
       clearId()
+      updateTimerState('isStarted', false)
     }
 
     updateDisplay()
   }
 
   function start() {
-    if (timer.isRunning) {
+    if (!timer.isStarted || !timer.isPaused) {
       const { hours, minutes, seconds } = timer
       display = { hours, minutes, seconds }
     }
 
-    if (timer.id) { return }
+    if (timer.id && timer.isStarted) { return }
 
+    updateTimerState('isStarted', true)
+    updateTimerState('isPaused', false)
     updateTimerState('id', setInterval(clock, 1000))
-    updateTimerState('isRunning', true)
   }
 
   function pause() {
     clearId()
+    updateTimerState('isPaused', true)
   }
 
   function reset() {
-    clearId()
+    clearInterval(timer.id)
     setTimer(initialTimeState)
   }
 
   useEffect(() => {
-    if (!timer.isRunning) {
+    if (!timer.isStarted) {
       display = {
         hours: timer.hours,
         minutes: timer.minutes,
@@ -108,7 +111,7 @@ export default function useStopwatch() {
 
   useEffect(() => {
     return () => clearInterval(timer.id)
-  }, [])
+  }, [timer.id])
 
   return {
     timer,
