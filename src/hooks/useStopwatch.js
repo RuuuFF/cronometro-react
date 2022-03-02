@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 const initialTimeState = {
   display: '00:00:00',
@@ -42,12 +42,12 @@ export default function useStopwatch() {
     }
   }
 
-  function updateDisplay() {
+  const updateDisplay = useCallback(() => {
     const value = [display.hours, display.minutes, display.seconds]
       .map(time => format(time)).join(':')
 
     updateTimerState('display', value)
-  }
+  }, [])
 
   function clearId() {
     clearInterval(timer.id)
@@ -107,7 +107,7 @@ export default function useStopwatch() {
 
       updateDisplay()
     }
-  }, [timer.hours, timer.minutes, timer.seconds])
+  }, [timer.hours, timer.minutes, timer.seconds, timer.isStarted, updateDisplay])
 
   useEffect(() => {
     return () => clearInterval(timer.id)
